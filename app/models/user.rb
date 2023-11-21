@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_paper_trail
+
   has_many :bets
 
   # Include default devise modules. Others available are:
@@ -18,5 +20,16 @@ class User < ApplicationRecord
 
   def total_points
     bets.sum(:points)
+  end
+
+  def log_login
+    self.update_columns(login_status: 'login') # Optional: you can add a column to track login status
+    self.paper_trail.save_with_version
+  end
+
+  def log_logout
+    binding.pry
+    self.update_columns(login_status: 'logout')
+    self.paper_trail.save_with_version
   end
 end

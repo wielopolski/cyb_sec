@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users
   resources :teams
-  resources :users, only: %i[show edit update]
+  resources :users do
+    member do
+        get 'edit_password_by_admin'
+        get 'show_versions'
+        patch 'update_password_by_admin'
+    end
+  end
+
   resources :rounds do
     member do
       post :summarize_round
