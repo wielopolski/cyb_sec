@@ -1,15 +1,42 @@
 <h1>Logs for <%= @user.email %></h1>
 
-<ul>
- <% @versions.each do |version| %>
-  <% log = version.reify %>
-    <li>
-      <%= log.first_name %> <%= log.last_name %> <%= log.is_admin %> <%= log.login_status %> <%= log.created_at %>
-    </li>
-  <% end %>
-  Aktualny set
-    <li>
-      <%= current_user.first_name %> <%= current_user.last_name %> <%= current_user.is_admin %> <%= current_user.login_status %> <%= current_user.created_at %>
-    </li>
-</ul>
-
+<table>
+  <thead>
+    <tr>
+      <th>First name</th>
+      <th>Last name</th>
+      <th>Is admin</th>
+      <th>Created at</th>
+      <th>Event</th>
+      <th>whodunnit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @versions.each do |version| %>
+      <% log = version.reify %>
+      <tr>
+        <td><%= log.first_name %></td>
+        <td><%= log.last_name %></td>
+        <td><%= log.is_admin %></td>
+        <td><%= log.created_at %></td>
+        <% if version.id != @versions[0].id %>
+          <% version.event = log.login_status if log.login_status != version.previous.reify.login_status %>
+        <% end %>
+        <td><%= version.event %></td>
+        <% if version.whodunnit != nil %>
+          <td><%= User.find(version.whodunnit).email %></td>
+        <% else %>
+        <td>Application</td>
+        <%end%>
+      </tr>
+    <% end %>
+    <tr>
+      <td><%= @user.first_name %></td>
+      <td><%= @user.last_name %></td>
+      <td><%= @user.is_admin %></td>
+      <td><%= @user.created_at %></td>
+      <td><%= 'staus check' %></td>
+      <td><%= @user.email %></td>
+    </tr>
+  </tbody>
+</table>

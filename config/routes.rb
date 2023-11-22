@@ -1,11 +1,15 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: {
+    sessions: 'users/sessions'
+  }
   resources :teams
   resources :users do
     member do
-        get 'edit_password_by_admin'
-        get 'show_versions'
-        patch 'update_password_by_admin'
+      get 'edit_password_by_admin'
+      get 'show_versions'
+      patch 'update_password_by_admin'
+      post 'block'
+      post 'unblock'
     end
   end
 

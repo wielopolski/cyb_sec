@@ -16,6 +16,14 @@
         <td><h6 class="card-subtitle mb-2"><%= user.full_name %></h6></td>
         <td><%= link_to "Edit this user", edit_user_path(user), class: "btn btn-primary"%></td>
         <td><%= link_to "Edit user password", edit_password_by_admin_user_path(user), class: "btn btn-primary"%></td>
+        <td>
+          <% if user.blocked? %>
+            <%= button_to 'Unblock', unblock_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-success' %>
+          <% else %>
+            <%= button_to 'Block', block_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+          <% end %>
+        </td>
+        <td><%= link_to "View Versions", show_versions_user_path(user), class: "btn btn-primary"%></td>
       </tr>
     <% end %>
   </tbody>

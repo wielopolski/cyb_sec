@@ -5,8 +5,9 @@ class User < ApplicationRecord
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+  devise :database_authenticatable, :registerable, :trackable,
+         :recoverable, :rememberable, :validatable, :lockable,
+         :timeoutable, timeout_in: 2.minutes
 
   has_one_attached :avatar
 
@@ -28,8 +29,25 @@ class User < ApplicationRecord
   end
 
   def log_logout
-    binding.pry
     self.update_columns(login_status: 'logout')
     self.paper_trail.save_with_version
+  end
+
+  # def lock_access!
+  #   self.failed_attempts = 0
+  #   super
+  # end
+
+  def lock_access!
+    self.failed_attempts = 0
+    self.locked_at = Time.current
+    self.unlock_token = nil # Reset the unlock token
+    save(validate: false) # Save without validations to avoid issues with other fields
+
+    # send_unlock_instructions # Optionally send unlock instructions via email
+  end
+
+  def increment_failed_attempts
+    update_attribute(:failed_attempts, failed_attempts + 1)
   end
 end

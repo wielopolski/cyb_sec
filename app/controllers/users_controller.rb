@@ -1,14 +1,15 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update]
-  before_action :authorize_admin, only: [:new, :create, :edit_password_by_admin, :update_password_by_admin]
+  before_action :authorize_admin, only: [:new, :create, :edit_password_by_admin, :update_password_by_admin, :block, :unblock]
+  before_action :set_paper_trail_whodunnit
 
   def new
-    binding.pry
+    # binding.pry
     @user = User.new
   end
 
   def create
-    binding.pry
+    # binding.pry
     # @user = User.new(create_user_params.merge(password_confirmation: create_user_params.password))
     # if @user.save
     #   binding.pry
@@ -59,6 +60,31 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @versions = @user.versions
   end
+
+  def block
+    user = User.find(params[:id])
+    user.update(blocked: true)
+    redirect_to users_path, notice: "User blocked successfully."
+  end
+
+  def unblock
+    user = User.find(params[:id])
+    user.update(blocked: false)
+    redirect_to users_path, notice: "User unblocked successfully."
+  end
+
+#   def perform_action
+#     # Your logic here
+
+#     # Set the "whodunnit" user
+#     PaperTrail.request.whodunnit = 'wielo'
+# binding.pry
+#     # Make changes to the model
+#     your_model_instance.update_attribute(:attribute_name, new_value)
+
+#     # Clear the "whodunnit" user to avoid unintentional side effects
+#     PaperTrail.request.whodunnit = nil
+#   end
 
   private
 
