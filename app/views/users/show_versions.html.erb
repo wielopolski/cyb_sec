@@ -14,21 +14,38 @@
   <tbody>
     <% @versions.each do |version| %>
       <% log = version.reify %>
-      <tr>
-        <td><%= log.first_name %></td>
-        <td><%= log.last_name %></td>
-        <td><%= log.is_admin %></td>
-        <td><%= log.created_at %></td>
-        <% if version.id != @versions[0].id %>
-          <% version.event = log.login_status if log.login_status != version.previous.reify.login_status %>
-        <% end %>
-        <td><%= version.event %></td>
-        <% if version.whodunnit != nil %>
-          <td><%= User.find(version.whodunnit).email %></td>
-        <% else %>
-        <td>Application</td>
-        <%end%>
-      </tr>
+
+      <% if log %>
+
+        <tr>
+          <td><%= log.try(:first_name) %></td>
+          <td><%= log.try(:last_name) %></td>
+          <td><%= log.try(:is_admin) %></td>
+          <td><%= version.created_at %></td>
+          <% if version.id != @versions[1].id %>
+            <% version.event = log.login_status if log.login_status != version.previous.reify.login_status %>
+          <% end %>
+          <td><%= version.event %></td>
+          <% if version.whodunnit != nil %>
+            <td><%= User.find(version.whodunnit).email %></td>
+          <% else %>
+          <td>Application</td>
+          <%end%>
+        </tr>
+      <%else%>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><%= version.created_at %></td>
+          <td><%= version.event %></td>
+          <% if version.whodunnit != nil %>
+            <td><%= User.find(version.whodunnit).email %></td>
+          <% else %>
+            <td>Application</td>
+          <%end%>
+        </tr>
+      <% end %>
     <% end %>
     <tr>
       <td><%= @user.first_name %></td>

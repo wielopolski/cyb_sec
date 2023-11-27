@@ -10,9 +10,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  # def create
-  #   super
-  # end
+  def create
+    super do |user|
+      # Your additional logic after creating a user, e.g., sending a welcome email
+
+      # Set up OTP for the user during registration
+      user.generate_otp_secret_key
+      user.save
+      redirect_to new_user_session_path, notice: "Please log in for the first time."
+    end
+  end
 
   # GET /resource/edit
   # def edit

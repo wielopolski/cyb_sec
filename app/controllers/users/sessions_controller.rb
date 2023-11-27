@@ -13,10 +13,18 @@ class Users::SessionsController < Devise::SessionsController
 
   def create
     self.resource = warden.authenticate(auth_options)
+
     if resource && resource.valid_password?(params[:user][:password])
-      sign_in(resource_name, resource)
-      yield resource if block_given?
-      respond_with resource, location: after_sign_in_path_for(resource)
+      if resource.otp_required_for_first_login?
+        # Redirect to the OTP verification page for the first login
+        resource.update(otp_random_number: generate_random_number)
+        redirect_to otp_verification_user_path(resource)
+      else
+        # Regular sign-in process
+        sign_in(resource_name, resource)
+        yield resource if block_given?
+        respond_with resource, location: after_sign_in_path_for(resource)
+      end
     else
       respond_with resource, location: new_user_session_path
     end
@@ -56,5 +64,9 @@ class Users::SessionsController < Devise::SessionsController
     else
       user.reset_failed_attempts!
     end
+  end
+  def generate_random_number
+    # Generate a random number for OTP
+    SecureRandom.random_number(0..99)
   end
 end

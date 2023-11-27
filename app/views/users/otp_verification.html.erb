@@ -1,0 +1,16 @@
+<h2>OTP Verification</h2>
+<p>
+  Your OTP random number (x) is: <%= current_user.otp_random_number %><br />
+  <b> OTP code is result: lg(a*x) </b>
+</p>
+
+<%= form_for(current_user, url: verify_otp_user_path(current_user), method: :post) do |f| %>
+  <div class="field">
+    <%= f.label :otp_code, 'Enter OTP Code:' %><br />
+    <%= f.text_field :otp_code, autocomplete: 'off' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Verify OTP' %>
+  </div>
+<% end %>

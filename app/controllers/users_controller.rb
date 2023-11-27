@@ -73,18 +73,24 @@ class UsersController < ApplicationController
     redirect_to users_path, notice: "User unblocked successfully."
   end
 
-#   def perform_action
-#     # Your logic here
+  def otp_verification
+    # Render the OTP verification form
+  end
 
-#     # Set the "whodunnit" user
-#     PaperTrail.request.whodunnit = 'wielo'
-# binding.pry
-#     # Make changes to the model
-#     your_model_instance.update_attribute(:attribute_name, new_value)
-
-#     # Clear the "whodunnit" user to avoid unintentional side effects
-#     PaperTrail.request.whodunnit = nil
-#   end
+  def verify_otp
+    # Implement OTP verification logic here
+    otp_key = Math.log(current_user.otp_random_number + current_user.email.size)
+    binding.pry
+    if otp_key.to_i == (params[:user][:otp_code]).to_i
+      current_user.update(otp_verified: true, first_login: false)
+      sign_in(current_user.class.name.underscore.to_sym, current_user)
+      redirect_to after_sign_in_path_for(current_user), notice: 'OTP verified successfully!'
+    else
+      current_user.update(otp_random_number: generate_random_number)
+      flash[:alert] = 'Invalid OTP. Please try again.'
+      redirect_to otp_verification_user_path(current_user), flash: { alert: flash[:alert] }
+    end
+  end
 
   private
 
@@ -108,5 +114,10 @@ class UsersController < ApplicationController
 
   def authorize_admin
     redirect_to root_path, alert: 'Access denied.' unless current_user && current_user.is_admin
+  end
+
+  def generate_random_number
+    # Generate a random number for OTP
+    SecureRandom.random_number(0..99)
   end
 end

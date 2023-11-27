@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     member do
       get 'edit_password_by_admin'
       get 'show_versions'
+      get 'otp_verification'
       patch 'update_password_by_admin'
+      post 'verify_otp'
       post 'block'
       post 'unblock'
     end

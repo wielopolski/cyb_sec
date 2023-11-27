@@ -1,7 +1,10 @@
+require 'matrix'
+
 class User < ApplicationRecord
   has_paper_trail
 
   has_many :bets
+  before_create :generate_otp_secret_key
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -10,6 +13,10 @@ class User < ApplicationRecord
          :timeoutable, timeout_in: 2.minutes
 
   has_one_attached :avatar
+
+  after_initialize :set_defaults
+
+  attr_accessor :otp_code
 
   def full_name
     "#{first_name} #{last_name}"
@@ -33,21 +40,29 @@ class User < ApplicationRecord
     self.paper_trail.save_with_version
   end
 
-  # def lock_access!
-  #   self.failed_attempts = 0
-  #   super
-  # end
-
   def lock_access!
     self.failed_attempts = 0
     self.locked_at = Time.current
     self.unlock_token = nil # Reset the unlock token
     save(validate: false) # Save without validations to avoid issues with other fields
 
-    # send_unlock_instructions # Optionally send unlock instructions via email
   end
 
   def increment_failed_attempts
     update_attribute(:failed_attempts, failed_attempts + 1)
   end
+
+  def generate_otp_secret_key
+    self.otp_verified = false
+  end
+
+  def set_defaults
+    self.otp_verified ||= false
+    self.first_login ||= true
+  end
+
+  def otp_required_for_first_login?
+    !otp_verified? && first_login?
+  end
+
 end
