@@ -17,6 +17,15 @@ class UsersController < ApplicationController
     # else
     #   render :new
     # end
+    super do |user|
+      # Your additional logic after creating a user, e.g., sending a welcome email
+
+      # Set up OTP for the user during registration
+      # binding.pry
+      user.generate_otp_secret_key
+      user.save
+      redirect_to new_user_session_path, notice: "Please log in for the first time."
+    end
   end
 
   # GET /users
@@ -79,8 +88,8 @@ class UsersController < ApplicationController
 
   def verify_otp
     # Implement OTP verification logic here
-    otp_key = Math.log(current_user.otp_random_number + current_user.email.size)
-    binding.pry
+    otp_key = Math.log(current_user.otp_random_number * current_user.email.size)
+    # binding.pry
     if otp_key.to_i == (params[:user][:otp_code]).to_i
       current_user.update(otp_verified: true, first_login: false)
       sign_in(current_user.class.name.underscore.to_sym, current_user)

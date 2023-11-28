@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
   before_action :authenticate_user!
-  before_action :require_otp_verified, if: :user_signed_in?, except: [:otp_verification]
+  # before_action :custom_authenticate_user!
+  before_action :require_otp_verified, if: :user_signed_in?, except: [:otp_verification, :verify_otp, :sign_out, :create]
   before_action :log_user_logout, if: :user_signed_in?, only: :destroy
 
   private
@@ -12,8 +13,10 @@ class ApplicationController < ActionController::Base
 
   def require_otp_verified
     if current_user.otp_required_for_first_login? && !current_user.otp_verified?
+      current_user.generate_otp_secret_key
+      current_user.save
       flash[:alert] = 'Please verify your OTP before accessing other page.'
-      redirect_to otp_verification_user_path(current_user)
+      redirect_to otp_verification_user_path(current_user), flash: { alert: flash[:alert] }
     end
   end
 

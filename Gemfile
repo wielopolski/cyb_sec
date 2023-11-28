@@ -56,6 +56,7 @@ gem 'devise'
 gem 'pagy'
 gem 'paper_trail'
 gem 'matrix'
+gem "recaptcha"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
