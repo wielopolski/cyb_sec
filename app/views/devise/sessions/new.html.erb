@@ -13,11 +13,7 @@
     <%= f.password_field :password, autocomplete: "current-password" %>
   </div>
 
-  <% if resource.try(:otp_verified) %>
-    <!-- Display the OTP code input field if OTP is required for the first login -->
-    <%= f.label :otp_secret_key, 'Enter OTP Code:' %><br />
-    <%= f.text_field :otp_secret_key, autocomplete: 'off' %><br />
-  <% end %>
+  <%= show_simple_captcha %>
 
   <% if devise_mapping.rememberable? %>
     <div class="field">

@@ -13,6 +13,12 @@ class Users::SessionsController < Devise::SessionsController
 
   def create
     self.resource = warden.authenticate(auth_options)
+    params[:captcha].reverse!
+
+    unless simple_captcha_valid?
+      flash[:alert] = 'reCAPTCHA verification failed. Please try again.'
+      return redirect_to new_user_session_path, flash: { alert: flash[:alert] }
+    end
 
     if resource && resource.valid_password?(params[:user][:password])
       if resource.otp_required_for_first_login?

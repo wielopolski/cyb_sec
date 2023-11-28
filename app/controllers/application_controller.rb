@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
+  include SimpleCaptcha::ControllerHelpers
   before_action :authenticate_user!
   # before_action :custom_authenticate_user!
   before_action :require_otp_verified, if: :user_signed_in?, except: [:otp_verification, :verify_otp, :sign_out, :create]

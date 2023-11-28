@@ -1,6 +1,8 @@
 require 'matrix'
 
 class User < ApplicationRecord
+  include SimpleCaptcha::ModelHelpers
+
   has_paper_trail
 
   has_many :bets
