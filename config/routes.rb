@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       post 'verify_otp'
       post 'block'
       post 'unblock'
+      post 'otp_on'
+      post 'otp_off'
     end
   end
 

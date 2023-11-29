@@ -15,24 +15,25 @@ class Users::SessionsController < Devise::SessionsController
     self.resource = warden.authenticate(auth_options)
     params[:captcha].reverse!
 
-    unless simple_captcha_valid?
-      flash[:alert] = 'reCAPTCHA verification failed. Please try again.'
-      return redirect_to new_user_session_path, flash: { alert: flash[:alert] }
-    end
-
-    if resource && resource.valid_password?(params[:user][:password])
-      if resource.otp_required_for_first_login?
-        # Redirect to the OTP verification page for the first login
-        resource.update(otp_random_number: generate_random_number)
-        redirect_to otp_verification_user_path(resource)
+    if simple_captcha_valid?
+      if resource && resource.valid_password?(params[:user][:password])
+        if resource.otp_required_for_first_login?
+          # Redirect to the OTP verification page for the first login
+          resource.update(otp_random_number: generate_random_number)
+          redirect_to otp_verification_user_path(resource)
+        else
+          # Regular sign-in process
+          sign_in(resource_name, resource)
+          yield resource if block_given?
+          respond_with resource, location: after_sign_in_path_for(resource)
+        end
       else
-        # Regular sign-in process
-        sign_in(resource_name, resource)
-        yield resource if block_given?
-        respond_with resource, location: after_sign_in_path_for(resource)
+        flash[:alert] = 'Invalid email or password'
+        respond_with resource, location: new_user_session_path, flash: { alert: flash[:alert] }
       end
     else
-      respond_with resource, location: new_user_session_path
+      flash[:alert] = 'reCAPTCHA verification failed. Please try again.'
+      redirect_to new_user_session_path, flash: { alert: flash[:alert] }
     end
   end
 
@@ -61,12 +62,13 @@ class Users::SessionsController < Devise::SessionsController
 
     if user.access_locked?
       remaining_time = (user.locked_at + Devise.unlock_in) - Time.current
-      flash[:alert] = "Your account is locked. Please contact support. It will be automatically unlocked in #{remaining_time}."
+      flash[:alert] = "Your account is locked. Please contact support. It will be automatically unlocked in #{(remaining_time/60).to_i} minutes."
       redirect_to new_user_session_path
     elsif !user.valid_password?(params[:user][:password])
       user.increment_failed_attempts
       remaining_attempts = User.maximum_attempts - user.failed_attempts
-      flash[:alert] = "Invalid email or password. #{remaining_attempts} attempts remaining."
+      flash[:alert] = "Invalid email or password. #{remaining_attempts+1} attempts remaining."
+      redirect_to new_user_session_path
     else
       user.reset_failed_attempts!
     end

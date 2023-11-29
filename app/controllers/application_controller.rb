@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   include SimpleCaptcha::ControllerHelpers
   before_action :authenticate_user!
   # before_action :custom_authenticate_user!
-  before_action :require_otp_verified, if: :user_signed_in?, except: [:otp_verification, :verify_otp, :sign_out, :create]
+  before_action :require_otp_verified, if: :user_signed_in?, except: [:otp_verification, :verify_otp, :sign_out, :create, :destroy]
   before_action :log_user_logout, if: :user_signed_in?, only: :destroy
 
   private
@@ -23,6 +23,11 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     current_user.log_login
+    '/'
+  end
+
+  def after_change_password_path_for(resource)
+    current_user.change_password
     '/'
   end
 

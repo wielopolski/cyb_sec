@@ -14,5 +14,7 @@
   <div class="d-flex gap-3">
     <%= link_to "Edit password for this user", edit_registration_path(@user), class: "btn btn-primary"%>
   </div>
-  <%= link_to "View Versions", show_versions_user_path(@user) %>
+  <div class="d-flex gap-3">
+    <%= link_to "View Versions", show_versions_user_path(@user), class: "btn btn-primary" %>
+  </div>
 </div>

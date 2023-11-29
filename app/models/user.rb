@@ -32,6 +32,11 @@ class User < ApplicationRecord
     bets.sum(:points)
   end
 
+  def change_password
+    self.update_columns(login_status: 'change password') # Optional: you can add a column to track login status
+    self.paper_trail.save_with_version
+  end
+
   def log_login
     self.update_columns(login_status: 'login') # Optional: you can add a column to track login status
     self.paper_trail.save_with_version
@@ -55,6 +60,7 @@ class User < ApplicationRecord
   end
 
   def generate_otp_secret_key
+    self.otp_random_number = SecureRandom.random_number(0...199)
     self.otp_verified = false
   end
 

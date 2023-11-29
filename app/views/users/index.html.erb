@@ -7,6 +7,8 @@
     <tr>
       <th scope="col">Email</th>
       <th scope="col">Name</th>
+      <th scope="col">OTP require</th>
+      <th scope="col">Admin?</th>
     </tr>
   </thead>
   <tbody>
@@ -14,6 +16,8 @@
       <tr>
         <td><h5 class="card-title"><%= user.email %></h5></td>
         <td><h6 class="card-subtitle mb-2"><%= user.full_name %></h6></td>
+        <td><h6 class="card-subtitle mb-2"><%= user.otp_verified %></h6></td>
+        <td><h6 class="card-subtitle mb-2"><%= user.is_admin %></h6></td>
         <td><%= link_to "Edit this user", edit_user_path(user), class: "btn btn-primary"%></td>
         <td><%= link_to "Edit user password", edit_password_by_admin_user_path(user), class: "btn btn-primary"%></td>
         <td>
@@ -21,6 +25,13 @@
             <%= button_to 'Unblock', unblock_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-success' %>
           <% else %>
             <%= button_to 'Block', block_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+          <% end %>
+        </td>
+        <td>
+          <% if user.otp_verified %>
+            <%= button_to 'Add OTP', otp_on_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-success' %>
+          <% else %>
+            <%= button_to 'Remove OTP', otp_off_user_path(user), method: :post, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
           <% end %>
         </td>
         <td><%= link_to "View Versions", show_versions_user_path(user), class: "btn btn-primary"%></td>

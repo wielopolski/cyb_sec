@@ -9,17 +9,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  def create
-    super do |user|
-      # Your additional logic after creating a user, e.g., sending a welcome email
+  # def create
+  #   # super do |user|
+  #   #   # Your additional logic after creating a user, e.g., sending a welcome email
 
-      # Set up OTP for the user during registration
-      # binding.pry
-      user.generate_otp_secret_key
-      user.save
-      redirect_to new_user_session_path, notice: "Please log in for the first time."
-    end
-  end
+  #   #   # Set up OTP for the user during registration
+  #   #   # binding.pry
+  #   #   user.generate_otp_secret_key
+  #   #   user.save
+  #   #   redirect_to new_user_session_path, notice: "Please log in for the first time."
+  #   # end
+  # end
 
   # GET /resource/edit
   def edit
@@ -28,25 +28,24 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # PUT /resource
   def update
-    # binding.pry
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
     unless verify_recaptcha(model: resource)
       flash[:alert] = 'reCAPTCHA verification failed. Please try again.'
-      return redirect_to edit_user_registration_path(resource), flash: { alert: flash[:alert] }
+      return redirect_to edit_user_registration_path, flash: { alert: flash[:alert] }
     end
-
     resource_updated = update_resource(resource, account_update_params)
+
     yield resource if block_given?
+    binding.pry
     if resource_updated
-      # binding.pry
       set_flash_message_for_update(resource, t('devise.passwords.updated_not_active'))
       bypass_sign_in resource, scope: resource_name if sign_in_after_change_password?
-      respond_with resource, location: after_sign_in_path_for(resource)
+      respond_with resource, location: after_change_password_path_for(resource)
     else
-      # binding.pry
+      flash[:alert] = 'Password is incorrect or difference'
       clean_up_passwords resource
       set_minimum_password_length
-      respond_with resource
+      return redirect_to edit_user_registration_path, flash: { alert: flash[:alert] }
     end
   end
 

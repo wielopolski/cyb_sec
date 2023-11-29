@@ -6,6 +6,7 @@
       <th>First name</th>
       <th>Last name</th>
       <th>Is admin</th>
+      <th>Blocked</th>
       <th>Created at</th>
       <th>Event</th>
       <th>whodunnit</th>
@@ -21,6 +22,7 @@
           <td><%= log.try(:first_name) %></td>
           <td><%= log.try(:last_name) %></td>
           <td><%= log.try(:is_admin) %></td>
+          <td><%= log.try(:blocked) %></td>
           <td><%= version.created_at %></td>
           <% if version.id != @versions[1].id %>
             <% version.event = log.login_status if log.login_status != version.previous.reify.login_status %>
